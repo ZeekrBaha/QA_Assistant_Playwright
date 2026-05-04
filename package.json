@@ -1,0 +1,18 @@
+{
+  "name": "qa-assistant-reliable",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"uvicorn backend.server:app --reload --port 8000\" \"cd frontend && npm run dev\"",
+    "dev:backend": "uvicorn backend.server:app --reload --port 8000",
+    "dev:frontend": "cd frontend && npm run dev",
+    "test:backend": ".venv/bin/python -m pytest",
+    "test:frontend": "cd frontend && npm test",
+    "test:e2e": "playwright test",
+    "test": ".venv/bin/python -m pytest && cd frontend && npm test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "concurrently": "^8.2.2"
+  }
+}
