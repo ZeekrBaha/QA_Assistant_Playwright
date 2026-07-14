@@ -142,16 +142,7 @@ def _resolve_host(hostname: str) -> set[str]:
 
 
 def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
-    return any(
-        (
-            ip.is_private,
-            ip.is_loopback,
-            ip.is_link_local,
-            ip.is_multicast,
-            ip.is_reserved,
-            ip.is_unspecified,
-        )
-    )
+    return not ip.is_global
 
 
 async def process_message_for_dom(message: str, is_locator_mode: bool = False) -> dict:

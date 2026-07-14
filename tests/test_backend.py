@@ -226,6 +226,9 @@ def test_ssrf_protection_rejects_unsafe_urls():
     with pytest.raises(ValueError, match="private or unsafe"):
         validate_public_http_url("http://127.0.0.1:8000")
 
+    with pytest.raises(ValueError, match="private or unsafe"):
+        validate_public_http_url("http://100.64.0.1")
+
 
 @pytest.mark.asyncio
 async def test_process_message_for_dom_builds_locator_prompt_for_html():
