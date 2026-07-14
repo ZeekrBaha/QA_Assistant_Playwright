@@ -18,6 +18,8 @@ def normalize_domain(domain: str) -> str:
         raise ValueError("Atlassian domain must include a hostname.")
     if parsed.username or parsed.password:
         raise ValueError("Atlassian domain must not include URL userinfo.")
+    if not parsed.hostname.lower().endswith(".atlassian.net"):
+        raise ValueError("Atlassian domain must be an Atlassian Cloud hostname.")
     if parsed.path or parsed.params or parsed.query or parsed.fragment:
         raise ValueError("Atlassian domain must be a hostname only.")
     return f"https://{parsed.netloc.lower()}"
