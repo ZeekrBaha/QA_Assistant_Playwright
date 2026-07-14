@@ -206,7 +206,7 @@ PLAYWRIGHT_BASE_URL=http://127.0.0.1:5181 npm run test:e2e
 
 Current validation status before publishing:
 
-- Backend tests: 16 passed.
+- Backend tests: 19 passed.
 - Frontend unit tests: 17 passed.
 - Playwright smoke test: 1 passed.
 - OpenAI backend `.env` key fallback: validated through the UI.
@@ -230,6 +230,13 @@ Set `QA_ASSISTANT_ACCESS_TOKEN`, use HTTPS behind a trusted proxy, and keep allo
 ### Public
 
 Do not expose this app publicly without real authentication, rate limiting, secret management, audit logging, and careful repo sandboxing.
+
+## Known Limitations
+
+- Provider keys pasted into the UI are stored in browser localStorage for convenience. Use server-side `.env` keys for more controlled local runs.
+- Repo integration is local-machine functionality. It is disabled until both `QA_ASSISTANT_ACCESS_TOKEN` and `QA_ASSISTANT_ALLOWED_REPO_ROOTS` are configured.
+- Provider adapters catch SDK/network failures broadly and return user-facing error text; live provider behavior should be rechecked with real API keys before public release.
+- The backend uses pinned `requirements.txt` versions but does not yet include a generated Python lockfile.
 
 ## Git Hygiene
 
