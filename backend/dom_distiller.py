@@ -134,7 +134,7 @@ async def _read_capped_response(response: httpx.Response, max_bytes: int) -> str
 
 def _resolve_host(hostname: str) -> set[str]:
     try:
-        return {result[4][0] for result in socket.getaddrinfo(hostname, None)}
+        return {str(result[4][0]) for result in socket.getaddrinfo(hostname, None)}
     except socket.gaierror as exc:
         raise ValueError(f"Could not resolve hostname: {hostname}") from exc
 

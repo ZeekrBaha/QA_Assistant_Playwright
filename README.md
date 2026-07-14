@@ -216,7 +216,9 @@ Current validation status before publishing:
 
 GitHub Actions runs Ruff, backend tests, frontend linting and unit tests, and the
 Playwright smoke test on every push and pull request. The end-to-end job starts
-the backend and frontend locally; it does not require a provider API key.
+the backend and frontend locally; it does not require a provider API key. Mypy
+checks the backend except `backend.logic`, where provider SDK payload typing is
+tracked as adapter debt until the live providers are revalidated.
 
 ## Deployment Modes
 

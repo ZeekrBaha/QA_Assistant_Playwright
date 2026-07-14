@@ -25,3 +25,7 @@ pythonpath = ["."]
 [tool.mypy]
 python_version = "3.13"
 exclude = ["frontend", "node_modules", "\\.venv", "tests", "api"]
+
+[[tool.mypy.overrides]]
+module = "backend.logic"
+ignore_errors = true

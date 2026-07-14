@@ -34,6 +34,9 @@ jobs:
       - name: Lint Python
         run: uvx ruff check .
 
+      - name: Type check backend
+        run: uv run mypy backend
+
       - name: Test backend
         run: uv run python -m pytest
 
