@@ -99,7 +99,7 @@ When `QA_ASSISTANT_ACCESS_TOKEN` is set, the frontend must send the same value a
 - Repo writes require explicit approval from the UI.
 - Repo operations are disabled unless `QA_ASSISTANT_ALLOWED_REPO_ROOTS` is set, and are restricted to those roots.
 - Test execution is allowlisted and time-limited.
-- URL fetching is restricted to public `http`/`https`, blocks private IP ranges, limits redirects, and caps response size.
+- URL fetching is restricted to public `http`/`https`, rejects embedded credentials, blocks private IP ranges, limits redirects, and caps response size.
 - Atlassian integration accepts only HTTPS hostnames, for example `company.atlassian.net`, not full ticket/wiki URLs.
 - `QA_ASSISTANT_VERIFY_SSL=false` exists only for trusted corporate proxy environments.
 

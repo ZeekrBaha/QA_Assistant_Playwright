@@ -90,6 +90,8 @@ def validate_public_http_url(url: str) -> str:
         raise ValueError("Only http and https URLs are allowed.")
     if not parsed.hostname:
         raise ValueError("URL must include a hostname.")
+    if parsed.username or parsed.password:
+        raise ValueError("URL must not include userinfo.")
 
     for address in _resolve_host(parsed.hostname):
         ip = ipaddress.ip_address(address)

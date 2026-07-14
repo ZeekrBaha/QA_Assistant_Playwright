@@ -188,6 +188,9 @@ def test_ssrf_protection_rejects_unsafe_urls():
     with pytest.raises(ValueError, match="Only http and https"):
         validate_public_http_url("file:///etc/passwd")
 
+    with pytest.raises(ValueError, match="userinfo"):
+        validate_public_http_url("https://user:password@127.0.0.1:8000")
+
     with pytest.raises(ValueError, match="private or unsafe"):
         validate_public_http_url("http://127.0.0.1:8000")
 
