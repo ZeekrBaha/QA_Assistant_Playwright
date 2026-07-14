@@ -33,7 +33,7 @@ class GenerateRequest(BaseModel):
     provider: str
     message: str = Field(min_length=1)
     api_key: str = Field(default="", max_length=20_000)
-    temperature: float = 0.6
+    temperature: float = Field(default=0.6, ge=0, le=2)
     model_name: str = Field(default="", max_length=200)
     image_data: str | None = None
     is_locator_mode: bool = False

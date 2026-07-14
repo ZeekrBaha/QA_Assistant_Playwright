@@ -86,6 +86,20 @@ def test_generate_rejects_oversized_message(monkeypatch):
     assert response.status_code == 422
 
 
+def test_generate_rejects_temperature_outside_provider_range():
+    low = client.post(
+        "/api/generate",
+        json={"provider": "openai", "message": "hello", "temperature": -0.1},
+    )
+    high = client.post(
+        "/api/generate",
+        json={"provider": "openai", "message": "hello", "temperature": 2.1},
+    )
+
+    assert low.status_code == 422
+    assert high.status_code == 422
+
+
 def test_generate_routes_unknown_provider():
     response = client.post(
         "/api/generate",
