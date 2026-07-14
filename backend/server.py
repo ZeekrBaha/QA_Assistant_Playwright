@@ -63,6 +63,8 @@ class GenerateRequest(BaseModel):
         for item in value:
             if not isinstance(item, dict):
                 raise ValueError("conversation_history entries must be objects")
+            if item.get("role") not in {"user", "assistant"}:
+                raise ValueError("conversation_history role must be user or assistant")
             content = item.get("content", "")
             if not isinstance(content, str):
                 raise ValueError("conversation_history content must be a string")
