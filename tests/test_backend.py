@@ -279,6 +279,9 @@ def test_jira_domain_normalization_rejects_insecure_or_non_host_inputs():
     with pytest.raises(ValueError, match="Atlassian Cloud"):
         normalize_domain("https://tickets.example.com")
 
+    with pytest.raises(ValueError, match="port"):
+        normalize_domain("https://company.atlassian.net:8443")
+
 
 def test_repo_scan_and_proposal_are_limited_to_allowed_roots(tmp_path, monkeypatch):
     monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(tmp_path))

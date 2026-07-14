@@ -20,9 +20,15 @@ def normalize_domain(domain: str) -> str:
         raise ValueError("Atlassian domain must not include URL userinfo.")
     if not parsed.hostname.lower().endswith(".atlassian.net"):
         raise ValueError("Atlassian domain must be an Atlassian Cloud hostname.")
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError("Atlassian domain must use the default HTTPS port.") from exc
+    if port not in {None, 443}:
+        raise ValueError("Atlassian domain must use the default HTTPS port.")
     if parsed.path or parsed.params or parsed.query or parsed.fragment:
         raise ValueError("Atlassian domain must be a hostname only.")
-    return f"https://{parsed.netloc.lower()}"
+    return f"https://{parsed.hostname.lower()}"
 
 
 def auth_headers(email: str, api_token: str) -> dict:
