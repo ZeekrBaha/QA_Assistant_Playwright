@@ -13,6 +13,9 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 "backend/repo_integration.py" = ["E501"]
 "tests/test_backend.py" = ["E501"]
 
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
 [tool.mypy]
 python_version = "3.13"
 exclude = ["frontend", "node_modules", "\\.venv", "tests", "api"]
