@@ -317,7 +317,9 @@ def generate_image_gemini(prompt: str, api_key: str, model_name: str = "gemini-2
 def generate_image(prompt: str, provider: str = "openai", model_name: str = "", api_key: str = "") -> str:
     if provider == "gemini":
         return generate_image_gemini(prompt, api_key, model_name or "gemini-2.0-flash-preview-image-generation")
-    return generate_image_openai(prompt, api_key)
+    if provider == "openai":
+        return generate_image_openai(prompt, api_key)
+    return "Image generation is available only with OpenAI or Gemini."
 
 
 def get_ollama_models() -> list[str]:

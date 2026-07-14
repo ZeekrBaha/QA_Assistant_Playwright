@@ -124,6 +124,12 @@ def test_generate_routes_unknown_provider():
     assert response.json()["response"] == "Unknown provider: unknown"
 
 
+def test_image_generation_rejects_unsupported_providers():
+    result = logic.generate_image("Generate a login screen", provider="claude", api_key="claude-key")
+
+    assert result == "Image generation is available only with OpenAI or Gemini."
+
+
 def test_openai_provider_uses_env_key_and_model(monkeypatch):
     captured = {}
 
