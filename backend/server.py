@@ -1,7 +1,6 @@
 import json
 import os
 import subprocess
-from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,14 +8,13 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
-from backend.config import settings
 from backend.atlassian import get_jira_issue, search_jira_jql
+from backend.config import settings
 from backend.dom_distiller import process_message_for_dom
 from backend.logic import generate_image, generate_tests, get_ollama_models, stream_tests
 from backend.repo_integration import propose_test_file, run_repo_tests, scan_repo, write_proposed_file
 from backend.security import require_backend_token
 from backend.web_search import perform_web_search
-
 
 protected = [Depends(require_backend_token)]
 app = FastAPI(title="QA Assistant Reliable API")
@@ -36,9 +34,9 @@ class GenerateRequest(BaseModel):
     api_key: str = Field(default="", max_length=20_000)
     temperature: float = 0.6
     model_name: str = Field(default="", max_length=200)
-    image_data: Optional[str] = None
+    image_data: str | None = None
     is_locator_mode: bool = False
-    conversation_history: Optional[list] = None
+    conversation_history: list | None = None
 
     @field_validator("message")
     @classmethod
@@ -49,14 +47,14 @@ class GenerateRequest(BaseModel):
 
     @field_validator("image_data")
     @classmethod
-    def image_size(cls, value: Optional[str]) -> Optional[str]:
+    def image_size(cls, value: str | None) -> str | None:
         if value and len(value) > settings.max_image_data_chars:
             raise ValueError(f"image_data exceeds {settings.max_image_data_chars} characters")
         return value
 
     @field_validator("conversation_history")
     @classmethod
-    def history_size(cls, value: Optional[list]) -> Optional[list]:
+    def history_size(cls, value: list | None) -> list | None:
         if value is None:
             return value
         if len(value) > settings.max_history_messages:
@@ -74,9 +72,9 @@ class GenerateRequest(BaseModel):
 
 class GenerateResponse(BaseModel):
     response: str
-    distilled_dom: Optional[str] = None
-    source_url: Optional[str] = None
-    dom_warning: Optional[str] = None
+    distilled_dom: str | None = None
+    source_url: str | None = None
+    dom_warning: str | None = None
 
 
 class GenerateImageRequest(BaseModel):

@@ -3,13 +3,12 @@ import os
 import re
 from collections.abc import AsyncIterator
 
-import httpx
 import google.generativeai as genai
+import httpx
 from openai import OpenAI
 
 from backend.config import settings
 from backend.templates import SYSTEM_PROMPT, format_user_prompt
-
 
 SUPPORTED_PROVIDERS = {"gemini", "openai", "claude", "deepseek", "mistral", "kimi", "groq", "ollama"}
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")

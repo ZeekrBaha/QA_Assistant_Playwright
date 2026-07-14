@@ -142,6 +142,10 @@ Open:
 http://127.0.0.1:5181
 ```
 
+## Screenshot
+
+![QA Assistant workspace showing generation controls, output modes, and repo integration](docs/screenshots/qa-operations-console.png)
+
 ## Example Prompt
 
 Use OpenAI or another configured provider, choose `Gherkin scenarios`, and send:
@@ -202,6 +206,12 @@ Current validation status before publishing:
 - Frontend unit tests: 17 passed.
 - Playwright smoke test: 1 passed.
 - OpenAI backend `.env` key fallback: validated through the UI.
+
+## Continuous Integration
+
+GitHub Actions runs Ruff, backend tests, frontend linting and unit tests, and the
+Playwright smoke test on every push and pull request. The end-to-end job starts
+the backend and frontend locally; it does not require a provider API key.
 
 ## Deployment Modes
 

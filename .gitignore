@@ -10,3 +10,6 @@ frontend/dist/
 frontend/coverage/
 test-results/
 playwright-report/
+.ruff_cache/
+.mypy_cache/
+AGENTS.md

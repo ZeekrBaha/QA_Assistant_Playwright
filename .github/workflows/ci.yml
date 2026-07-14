@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Install Python dependencies
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+
+      - name: Lint Python
+        run: uvx ruff check .
+
+      - name: Test backend
+        run: uv run pytest
+
+      - name: Install Node dependencies
+        run: |
+          npm ci
+          npm --prefix frontend ci
+
+      - name: Lint and test frontend
+        run: |
+          npm --prefix frontend run lint
+          npm --prefix frontend test
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright smoke test
+        run: |
+          uv run uvicorn backend.server:app --host 127.0.0.1 --port 8000 &
+          QA_API_TARGET=http://127.0.0.1:8000 npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 &
+          until curl --fail --silent http://127.0.0.1:8000/api/health && curl --fail --silent http://127.0.0.1:5173; do sleep 1; done
+          npm run test:e2e

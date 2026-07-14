@@ -1,15 +1,20 @@
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
+import backend.server as server_module
 from backend import logic
 from backend.atlassian import extract_adf_text, format_jira_issue, format_jira_search, normalize_domain
 from backend.dom_distiller import distill_html, process_message_for_dom, validate_public_http_url
 from backend.repo_integration import propose_test_file, run_repo_tests, scan_repo, write_proposed_file
-import backend.server as server_module
 from backend.server import app
 
-
 client = TestClient(app)
+
+
+def test_asgi_deployment_entrypoint_exports_application():
+    from api.index import app as deployment_app
+
+    assert deployment_app is app
 
 
 def test_health():

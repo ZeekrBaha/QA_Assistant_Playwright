@@ -1,12 +1,11 @@
 import difflib
 import json
 import os
-from pathlib import Path
 import shlex
 import subprocess
+from pathlib import Path
 
 from backend.config import settings
-
 
 ALLOWED_TEST_COMMANDS = {
     "npm test",
@@ -192,7 +191,7 @@ def _suggest_test_path(scan: dict, output_mode: str) -> Path:
 def _build_test_skeleton(scan: dict, instruction: str, output_mode: str) -> str:
     header = f"// Generated proposal for {Path(scan['repo_path']).name}\n// Instruction: {instruction}\n\n"
     if output_mode == "gherkin":
-        return f"Feature: Generated workflow\n\n  Scenario: Proposed coverage\n    Given the application is ready\n    When the user performs the workflow from the ticket\n    Then the expected outcome should be verified\n"
+        return "Feature: Generated workflow\n\n  Scenario: Proposed coverage\n    Given the application is ready\n    When the user performs the workflow from the ticket\n    Then the expected outcome should be verified\n"
     if output_mode == "selenium":
         return "import org.junit.jupiter.api.Test;\n\nclass GeneratedWorkflowTest {\n    @Test\n    void generatedWorkflow() {\n        // TODO: Implement Selenium steps from approved scenarios.\n    }\n}\n"
     if output_mode == "cypress":

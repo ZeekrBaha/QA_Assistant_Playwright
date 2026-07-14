@@ -9,7 +9,6 @@ from bs4 import BeautifulSoup
 
 from backend.config import settings
 
-
 SEMANTIC_TAGS = {
     "button",
     "a",
