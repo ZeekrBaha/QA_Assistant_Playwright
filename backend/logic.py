@@ -52,6 +52,10 @@ def _missing_key_message(provider: str) -> str:
     return f"Please enter your {labels.get(provider, provider)} API key in the sidebar or configure it in the backend environment."
 
 
+def _provider_error(provider: str) -> str:
+    return f"{provider} Error: Provider request failed. Check the provider configuration and try again."
+
+
 def _openai_client(api_key: str, base_url: str | None = None) -> OpenAI:
     kwargs = {"api_key": api_key, "http_client": _http_client()}
     if base_url:
@@ -114,8 +118,8 @@ def generate_tests_gemini(
         else:
             response = model.generate_content(content, generation_config=config)
         return _clean_response(response.text)
-    except Exception as exc:
-        return f"Gemini Error: {exc}"
+    except Exception:
+        return _provider_error("Gemini")
 
 
 def generate_tests_openai(
@@ -148,8 +152,8 @@ def generate_tests_openai(
             params["temperature"] = temperature
         response = client.chat.completions.create(**params)
         return _clean_response(response.choices[0].message.content)
-    except Exception as exc:
-        return f"OpenAI Error: {exc}"
+    except Exception:
+        return _provider_error("OpenAI")
 
 
 def generate_tests_claude(
@@ -189,8 +193,8 @@ def generate_tests_claude(
             temperature=temperature,
         )
         return _clean_response(response.content[0].text)
-    except Exception as exc:
-        return f"Claude Error: {exc}"
+    except Exception:
+        return _provider_error("Claude")
 
 
 def generate_tests_openai_compatible(
@@ -215,8 +219,8 @@ def generate_tests_openai_compatible(
             temperature=temperature,
         )
         return _clean_response(response.choices[0].message.content)
-    except Exception as exc:
-        return f"{provider.title()} Error: {exc}"
+    except Exception:
+        return _provider_error(provider.title())
 
 
 def generate_tests_ollama(
@@ -235,9 +239,9 @@ def generate_tests_ollama(
             temperature=temperature,
         )
         return _clean_response(response.choices[0].message.content)
-    except Exception as exc:
+    except Exception:
         return (
-            f"Ollama Error: {exc}\n\n"
+            "Ollama Error: Could not reach Ollama.\n\n"
             "Ollama is not running or not installed.\n\n"
             "macOS:\n```bash\nbrew install ollama\nollama serve\n```\n\n"
             f"Pull a model: `ollama pull {model_name}`"
@@ -291,8 +295,8 @@ def generate_image_openai(prompt: str, api_key: str) -> str:
         client = _openai_client(api_key=api_key)
         response = client.images.generate(model="dall-e-3", prompt=prompt, size="1024x1024", quality="standard", n=1)
         return f"![Generated Image]({response.data[0].url})"
-    except Exception as exc:
-        return f"Image Generation Error: {exc}"
+    except Exception:
+        return "Image Generation Error: Provider request failed. Check the provider configuration and try again."
 
 
 def generate_image_gemini(prompt: str, api_key: str, model_name: str = "gemini-2.0-flash-preview-image-generation") -> str:
@@ -310,8 +314,8 @@ def generate_image_gemini(prompt: str, api_key: str, model_name: str = "gemini-2
                 img_b64 = base64.b64encode(part.inline_data.data).decode()
                 return f"![Generated Image](data:{part.inline_data.mime_type};base64,{img_b64})"
         return "Gemini returned no image. Try a different prompt or model."
-    except Exception as exc:
-        return f"Gemini Image Generation Error: {exc}"
+    except Exception:
+        return "Gemini Image Generation Error: Provider request failed. Check the provider configuration and try again."
 
 
 def generate_image(prompt: str, provider: str = "openai", model_name: str = "", api_key: str = "") -> str:
@@ -387,8 +391,8 @@ async def stream_tests_openai(source_code: str, api_key: str, model_name: str, t
         messages.append({"role": "user", "content": user_content})
         async for token in _stream_openai_compatible(client, model_name, messages, temperature, model_name in _OPENAI_REASONING_MODELS):
             yield token
-    except Exception as exc:
-        yield f"OpenAI Error: {exc}"
+    except Exception:
+        yield _provider_error("OpenAI")
 
 
 async def stream_tests_claude(source_code: str, api_key: str, model_name: str, temperature: float, image_data: str | None, history: list | None):
@@ -416,8 +420,8 @@ async def stream_tests_claude(source_code: str, api_key: str, model_name: str, t
         with client.messages.stream(model=model_name, max_tokens=4096, system=SYSTEM_PROMPT, messages=claude_messages, temperature=temperature) as stream:
             for text in stream.text_stream:
                 yield text
-    except Exception as exc:
-        yield f"Claude Error: {exc}"
+    except Exception:
+        yield _provider_error("Claude")
 
 
 async def stream_tests_openai_provider(provider: str, source_code: str, api_key: str, model_name: str, temperature: float, base_url: str, history: list | None):
@@ -431,8 +435,8 @@ async def stream_tests_openai_provider(provider: str, source_code: str, api_key:
         client = _openai_client(api_key=api_key, base_url=base_url)
         async for token in _stream_openai_compatible(client, model_name, _build_history_messages(history, system_prompt, user_prompt), temperature):
             yield token
-    except Exception as exc:
-        yield f"{provider.title()} Error: {exc}"
+    except Exception:
+        yield _provider_error(provider.title())
 
 
 async def stream_tests_ollama(source_code: str, api_key: str, model_name: str, temperature: float, image_data: str | None, history: list | None):
@@ -440,8 +444,8 @@ async def stream_tests_ollama(source_code: str, api_key: str, model_name: str, t
         client = _openai_client(api_key="ollama", base_url=f"{OLLAMA_BASE_URL}/v1")
         async for token in _stream_openai_compatible(client, model_name, _build_history_messages(history, SYSTEM_PROMPT, format_user_prompt(source_code)), temperature):
             yield token
-    except Exception as exc:
-        yield f"Ollama Error: {exc}"
+    except Exception:
+        yield "Ollama Error: Could not reach Ollama."
 
 
 async def stream_tests(

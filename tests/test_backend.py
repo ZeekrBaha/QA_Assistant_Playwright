@@ -130,6 +130,18 @@ def test_image_generation_rejects_unsupported_providers():
     assert result == "Image generation is available only with OpenAI or Gemini."
 
 
+def test_provider_errors_do_not_echo_api_keys(monkeypatch):
+    def fail_client(**_kwargs):
+        raise RuntimeError("Incorrect API key: secret-openai-key")
+
+    monkeypatch.setattr(logic, "OpenAI", fail_client)
+
+    result = logic.generate_tests("openai", "Generate a test", api_key="secret-openai-key")
+
+    assert result == "OpenAI Error: Provider request failed. Check the provider configuration and try again."
+    assert "secret-openai-key" not in result
+
+
 def test_openai_provider_uses_env_key_and_model(monkeypatch):
     captured = {}
 
