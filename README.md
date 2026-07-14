@@ -178,7 +178,7 @@ Generate a Playwright smoke test for the QA assistant workflow: open the app, ve
 8. Click `Write approved file`.
 9. Run an allowlisted command such as `npm test`.
 
-The app never silently modifies your repo.
+The app never silently modifies your repo. Approved writes are restricted to generated test artifact locations such as `tests/`, `features/`, and `cypress/e2e/`.
 
 ## Tests
 

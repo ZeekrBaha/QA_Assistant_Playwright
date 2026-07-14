@@ -307,6 +307,16 @@ def test_repo_write_requires_approval_and_safe_relative_path(tmp_path, monkeypat
     assert (tmp_path / "tests" / "example.spec.ts").read_text(encoding="utf-8") == "content"
 
 
+def test_repo_write_only_allows_test_artifact_paths(tmp_path, monkeypatch):
+    monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(tmp_path))
+
+    with pytest.raises(ValueError, match="test artifact"):
+        write_proposed_file(str(tmp_path), ".env", "SECRET=value", approved=True)
+
+    with pytest.raises(ValueError, match="test artifact"):
+        write_proposed_file(str(tmp_path), ".github/workflows/ci.yml", "name: ci", approved=True)
+
+
 def test_repo_test_command_allowlist(tmp_path, monkeypatch):
     monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(tmp_path))
 

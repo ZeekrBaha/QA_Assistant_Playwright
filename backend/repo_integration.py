@@ -16,6 +16,11 @@ ALLOWED_TEST_COMMANDS = {
     "python3 -m pytest",
     "npx playwright test",
 }
+ALLOWED_WRITE_PREFIXES = (
+    ("tests",),
+    ("features",),
+    ("cypress", "e2e"),
+)
 
 
 def resolve_repo_path(repo_path: str) -> Path:
@@ -106,6 +111,7 @@ def write_proposed_file(repo_path: str, relative_path: str, content: str, approv
 
     root = resolve_repo_path(repo_path)
     target = _safe_target(root, Path(relative_path))
+    _validate_test_artifact_path(target.relative_to(root))
     if target.exists() and not allow_overwrite:
         raise ValueError("Target file already exists. Enable overwrite to replace it.")
 
@@ -212,6 +218,12 @@ def _safe_target(root: Path, relative_path: Path) -> Path:
     if root not in target.parents and target != root:
         raise ValueError("Target path escapes repository root.")
     return target
+
+
+def _validate_test_artifact_path(relative_path: Path) -> None:
+    if not any(relative_path.parts[:len(prefix)] == prefix for prefix in ALLOWED_WRITE_PREFIXES):
+        allowed = ", ".join("/".join(prefix) for prefix in ALLOWED_WRITE_PREFIXES)
+        raise ValueError(f"Write target must be a generated test artifact under: {allowed}.")
 
 
 def _make_diff(existing: str, proposed: str, relative_path: str) -> str:
