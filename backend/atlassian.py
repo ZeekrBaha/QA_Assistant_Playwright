@@ -1,5 +1,6 @@
 import base64
 import re
+from urllib.parse import urlparse
 
 import httpx
 
@@ -10,7 +11,14 @@ def normalize_domain(domain: str) -> str:
     domain = domain.strip().rstrip("/")
     if not domain.startswith(("http://", "https://")):
         domain = f"https://{domain}"
-    return domain
+    parsed = urlparse(domain)
+    if parsed.scheme != "https":
+        raise ValueError("Atlassian domain must use HTTPS.")
+    if not parsed.hostname:
+        raise ValueError("Atlassian domain must include a hostname.")
+    if parsed.path or parsed.params or parsed.query or parsed.fragment:
+        raise ValueError("Atlassian domain must be a hostname only.")
+    return f"https://{parsed.netloc.lower()}"
 
 
 def auth_headers(email: str, api_token: str) -> dict:

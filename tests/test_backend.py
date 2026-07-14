@@ -243,6 +243,17 @@ def test_jira_search_format_and_domain_normalization():
     assert "**PROJ-1** [To Do | High]: Login (Assignee: Ada)" in format_jira_search(data)
 
 
+def test_jira_domain_normalization_rejects_insecure_or_non_host_inputs():
+    with pytest.raises(ValueError, match="HTTPS"):
+        normalize_domain("http://company.atlassian.net")
+
+    with pytest.raises(ValueError, match="hostname only"):
+        normalize_domain("https://company.atlassian.net/wiki/spaces/QA")
+
+    with pytest.raises(ValueError, match="hostname only"):
+        normalize_domain("https://company.atlassian.net?token=leak")
+
+
 def test_repo_scan_and_proposal_are_limited_to_allowed_roots(tmp_path, monkeypatch):
     monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(tmp_path))
     repo = tmp_path / "app"
