@@ -10,6 +10,21 @@ async def require_backend_token(x_backend_token: str = Header(default="")) -> No
     if not expected:
         return
 
+    _verify_token(x_backend_token, expected)
+
+
+async def require_configured_backend_token(x_backend_token: str = Header(default="")) -> None:
+    expected = settings.backend_access_token
+    if not expected:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Repo integration requires QA_ASSISTANT_ACCESS_TOKEN to be set.",
+        )
+
+    _verify_token(x_backend_token, expected)
+
+
+def _verify_token(x_backend_token: str, expected: str) -> None:
     if not x_backend_token or not hmac.compare_digest(x_backend_token, expected):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

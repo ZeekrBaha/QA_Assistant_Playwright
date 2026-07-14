@@ -82,18 +82,19 @@ QA_ASSISTANT_REPO_COMMAND_TIMEOUT_SECONDS=60
 `QA_ASSISTANT_ALLOWED_REPO_ROOTS` is required for repo scan, write, and test
 execution features. Leave it unset to disable local repo integration.
 
-Optional backend auth:
+Optional backend auth for general generation, required for repo integration:
 
 ```bash
 QA_ASSISTANT_ACCESS_TOKEN=choose-a-private-token
 ```
 
-When `QA_ASSISTANT_ACCESS_TOKEN` is set, the frontend must send the same value as `X-Backend-Token`. The UI has a field for this in the sidebar.
+When `QA_ASSISTANT_ACCESS_TOKEN` is set, the frontend must send the same value as `X-Backend-Token`. The UI has a field for this in the sidebar. Repo scan, write, and test execution routes always require this token to be configured and supplied.
 
 ## Security Notes
 
 - `.env` and `.env.*` are ignored by Git.
 - Never commit real provider keys.
+- Repo integration requires `QA_ASSISTANT_ACCESS_TOKEN`; do not expose file-write/test-runner routes without auth.
 - Repo writes require explicit approval from the UI.
 - Repo operations are disabled unless `QA_ASSISTANT_ALLOWED_REPO_ROOTS` is set, and are restricted to those roots.
 - Test execution is allowlisted and time-limited.

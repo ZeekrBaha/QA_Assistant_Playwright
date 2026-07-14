@@ -13,10 +13,11 @@ from backend.config import settings
 from backend.dom_distiller import process_message_for_dom
 from backend.logic import generate_image, generate_tests, get_ollama_models, stream_tests
 from backend.repo_integration import propose_test_file, run_repo_tests, scan_repo, write_proposed_file
-from backend.security import require_backend_token
+from backend.security import require_backend_token, require_configured_backend_token
 from backend.web_search import perform_web_search
 
 protected = [Depends(require_backend_token)]
+repo_protected = [Depends(require_configured_backend_token)]
 app = FastAPI(title="QA Assistant Reliable API")
 
 app.add_middleware(
@@ -215,7 +216,7 @@ async def ollama_models():
     return {"models": models, "connected": bool(models)}
 
 
-@app.post("/api/repo/scan", dependencies=protected)
+@app.post("/api/repo/scan", dependencies=repo_protected)
 async def repo_scan(req: RepoScanRequest):
     try:
         return scan_repo(req.repo_path)
@@ -223,7 +224,7 @@ async def repo_scan(req: RepoScanRequest):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.post("/api/repo/propose", dependencies=protected)
+@app.post("/api/repo/propose", dependencies=repo_protected)
 async def repo_propose(req: RepoProposalRequest):
     try:
         return propose_test_file(req.repo_path, req.instruction, req.output_mode)
@@ -231,7 +232,7 @@ async def repo_propose(req: RepoProposalRequest):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.post("/api/repo/write", dependencies=protected)
+@app.post("/api/repo/write", dependencies=repo_protected)
 async def repo_write(req: RepoWriteRequest):
     try:
         return write_proposed_file(req.repo_path, req.relative_path, req.content, req.approved, req.allow_overwrite)
@@ -239,7 +240,7 @@ async def repo_write(req: RepoWriteRequest):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.post("/api/repo/test", dependencies=protected)
+@app.post("/api/repo/test", dependencies=repo_protected)
 async def repo_test(req: RepoTestRequest):
     try:
         return run_repo_tests(req.repo_path, req.command)

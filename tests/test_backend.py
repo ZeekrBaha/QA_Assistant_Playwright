@@ -65,6 +65,16 @@ def test_backend_auth_gate_when_token_is_configured(monkeypatch):
     assert allowed.status_code == 200
 
 
+def test_repo_routes_require_configured_backend_token(tmp_path, monkeypatch):
+    monkeypatch.delenv("QA_ASSISTANT_ACCESS_TOKEN", raising=False)
+    monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(tmp_path))
+
+    response = client.post("/api/repo/scan", json={"repo_path": str(tmp_path)})
+
+    assert response.status_code == 401
+    assert "QA_ASSISTANT_ACCESS_TOKEN" in response.json()["detail"]
+
+
 def test_generate_rejects_oversized_message(monkeypatch):
     monkeypatch.setenv("QA_ASSISTANT_MAX_MESSAGE_CHARS", "10")
 
@@ -239,9 +249,14 @@ def test_repo_scan_rejects_paths_outside_allowed_roots(tmp_path, monkeypatch):
     outside = tmp_path / "outside"
     allowed.mkdir()
     outside.mkdir()
+    monkeypatch.setenv("QA_ASSISTANT_ACCESS_TOKEN", "secret-token")
     monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(allowed))
 
-    response = client.post("/api/repo/scan", json={"repo_path": str(outside)})
+    response = client.post(
+        "/api/repo/scan",
+        headers={"X-Backend-Token": "secret-token"},
+        json={"repo_path": str(outside)},
+    )
 
     assert response.status_code == 400
 
