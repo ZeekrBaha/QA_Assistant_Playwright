@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { apiJson, buildHeaders, parseSseEvents } from '../lib/api'
+import { apiJson, buildHeaders, parseSseEvents, readStreamResponse } from '../lib/api'
 
 describe('api helpers', () => {
   afterEach(() => {
@@ -51,5 +51,23 @@ describe('api helpers', () => {
         'X-Request-Id': 'request-123',
       },
     }))
+  })
+
+  it('dispatches the final SSE event without a trailing newline', async () => {
+    const encoder = new TextEncoder()
+    const response = {
+      ok: true,
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode('data: {"type":"token","content":"final"}'))
+          controller.close()
+        },
+      }),
+    }
+    const events = []
+
+    await readStreamResponse(response, (event) => events.push(event))
+
+    expect(events).toEqual([{ type: 'token', content: 'final' }])
   })
 })

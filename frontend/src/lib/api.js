@@ -60,10 +60,17 @@ export async function readStreamResponse(response, onEvent) {
     buffer = lines.pop()
 
     for (const line of lines) {
-      if (!line.startsWith('data: ')) continue
-      const payload = line.slice(6).trim()
-      if (!payload) continue
-      onEvent(payload === '[DONE]' ? { type: 'done' } : JSON.parse(payload))
+      dispatchSseLine(line, onEvent)
     }
   }
+
+  buffer += decoder.decode()
+  dispatchSseLine(buffer, onEvent)
+}
+
+function dispatchSseLine(line, onEvent) {
+  if (!line.startsWith('data: ')) return
+  const payload = line.slice(6).trim()
+  if (!payload) return
+  onEvent(payload === '[DONE]' ? { type: 'done' } : JSON.parse(payload))
 }
