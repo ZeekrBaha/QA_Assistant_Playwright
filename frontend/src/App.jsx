@@ -8,6 +8,7 @@ import { apiJson, buildHeaders, readStreamResponse } from './lib/api'
 import { getDefaultModel, getSelectedModel, loadModelPreferences, loadTemperature } from './lib/config'
 import { buildAtlassianRequest, buildConversationHistory, makeRegeneratePayload } from './lib/chat'
 import { analyzeLocatorConfidence } from './lib/locatorConfidence'
+import { loadApiKeys, loadAtlassianConfig, loadBackendToken, saveApiKeys, saveAtlassianConfig, saveBackendToken } from './lib/sensitiveStorage'
 import { buildAutomationSkeletonPrompt, buildStructuredPrompt, buildTicketScenarioPrompt } from './lib/workflow'
 
 function loadJson(key, fallback) {
@@ -21,7 +22,7 @@ function loadJson(key, fallback) {
 function App() {
   const [messages, setMessages] = useState(() => loadJson('qa_messages', []))
   const [provider, setProvider] = useState(() => localStorage.getItem('qa_provider') || 'openai')
-  const [apiKeys, setApiKeys] = useState(() => loadJson('qa_api_keys', {}))
+  const [apiKeys, setApiKeys] = useState(() => loadApiKeys())
   const [temperature, setTemperature] = useState(() => loadTemperature())
   const [modelPreferences, setModelPreferences] = useState(() => loadModelPreferences())
   const [selectedModel, setSelectedModel] = useState(() => getSelectedModel(localStorage.getItem('qa_provider') || 'openai', loadModelPreferences()))
@@ -29,21 +30,21 @@ function App() {
   const [action, setAction] = useState('text')
   const [outputMode, setOutputMode] = useState(() => localStorage.getItem('qa_output_mode') || 'test_cases_table')
   const [isLoading, setIsLoading] = useState(false)
-  const [atlassianConfig, setAtlassianConfig] = useState(() => loadJson('qa_atlassian', { domain: '', email: '', token: '' }))
+  const [atlassianConfig, setAtlassianConfig] = useState(() => loadAtlassianConfig())
   const [backendStatus, setBackendStatus] = useState('checking')
-  const [backendToken, setBackendToken] = useState(() => localStorage.getItem('qa_backend_token') || '')
+  const [backendToken, setBackendToken] = useState(() => loadBackendToken())
   const [ticketWorkflow, setTicketWorkflow] = useState(null)
   const [assistantStage, setAssistantStage] = useState('Ready for a prompt')
 
   useEffect(() => localStorage.setItem('qa_messages', JSON.stringify(messages)), [messages])
   useEffect(() => localStorage.setItem('qa_provider', provider), [provider])
-  useEffect(() => localStorage.setItem('qa_api_keys', JSON.stringify(apiKeys)), [apiKeys])
+  useEffect(() => saveApiKeys(apiKeys), [apiKeys])
   useEffect(() => localStorage.setItem('qa_temperature', String(temperature)), [temperature])
   useEffect(() => localStorage.setItem('qa_model_preferences', JSON.stringify(modelPreferences)), [modelPreferences])
   useEffect(() => localStorage.setItem('qa_streaming', String(streamingEnabled)), [streamingEnabled])
   useEffect(() => localStorage.setItem('qa_output_mode', outputMode), [outputMode])
-  useEffect(() => localStorage.setItem('qa_atlassian', JSON.stringify(atlassianConfig)), [atlassianConfig])
-  useEffect(() => localStorage.setItem('qa_backend_token', backendToken), [backendToken])
+  useEffect(() => saveAtlassianConfig(atlassianConfig), [atlassianConfig])
+  useEffect(() => saveBackendToken(backendToken), [backendToken])
 
   useEffect(() => {
     let cancelled = false

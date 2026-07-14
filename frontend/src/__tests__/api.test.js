@@ -19,8 +19,9 @@ describe('api helpers', () => {
     ])
   })
 
-  it('adds backend token header when configured', () => {
-    window.localStorage.setItem('qa_backend_token', 'secret-token')
+  it('adds backend token header from session storage only', () => {
+    window.localStorage.setItem('qa_backend_token', 'stale-local-token')
+    window.sessionStorage.setItem('qa_backend_token', 'secret-token')
 
     expect(buildHeaders()).toMatchObject({
       'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import { API_BASE } from './config'
+import { loadBackendToken } from './sensitiveStorage'
 
 export async function apiJson(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -20,7 +21,7 @@ export async function apiJson(path, options = {}) {
 }
 
 export function buildHeaders(headers = {}) {
-  const token = window.localStorage.getItem('qa_backend_token') || ''
+  const token = loadBackendToken()
   return {
     'Content-Type': 'application/json',
     ...(token ? { 'X-Backend-Token': token } : {}),

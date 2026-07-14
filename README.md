@@ -61,7 +61,7 @@ The frontend is React + Vite. The UI is organized around a visible QA pipeline:
 | Groq | `GROQ_API_KEY` | OpenAI-compatible API. |
 | Ollama | local `ollama serve` | Uses `http://localhost:11434` by default. |
 
-You can either put provider keys in `.env` or paste a temporary key in the UI sidebar. The UI key is sent to the backend for that request only and stored in browser localStorage.
+You can either put provider keys in `.env` or paste a temporary key in the UI sidebar. UI-entered provider keys, the backend access token, and Atlassian credentials are sent only for the matching request flow and are stored in browser sessionStorage for the current tab session.
 
 ## Environment
 
@@ -236,7 +236,7 @@ Do not expose this app publicly without real authentication, rate limiting, secr
 
 ## Known Limitations
 
-- Provider keys pasted into the UI are stored in browser localStorage for convenience. Use server-side `.env` keys for more controlled local runs.
+- Provider keys, backend access tokens, and Atlassian credentials pasted into the UI are stored only in browser sessionStorage for the current tab session. Use server-side `.env` keys for more controlled local runs.
 - Repo integration is local-machine functionality. It is disabled until both `QA_ASSISTANT_ACCESS_TOKEN` and `QA_ASSISTANT_ALLOWED_REPO_ROOTS` are configured.
 - Provider adapters catch SDK/network failures broadly and return user-facing error text; live provider behavior should be rechecked with real API keys before public release.
 
