@@ -59,7 +59,7 @@ class Settings:
     def allowed_repo_roots(self) -> list[str]:
         raw = os.getenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", "")
         if not raw.strip():
-            return [os.getcwd()]
+            return []
         return [item.strip() for item in raw.split(os.pathsep) if item.strip()]
 
     @property

@@ -24,6 +24,8 @@ def resolve_repo_path(repo_path: str) -> Path:
         raise ValueError("Repository path does not exist or is not a directory.")
 
     allowed_roots = [Path(root).expanduser().resolve() for root in settings.allowed_repo_roots]
+    if not allowed_roots:
+        raise ValueError("Repo integration requires QA_ASSISTANT_ALLOWED_REPO_ROOTS to be set.")
     if not any(candidate == root or root in candidate.parents for root in allowed_roots):
         roots = ", ".join(str(root) for root in allowed_roots)
         raise ValueError(f"Repository path is outside allowed roots: {roots}")

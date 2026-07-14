@@ -79,6 +79,9 @@ QA_ASSISTANT_ALLOWED_REPO_ROOTS=/Users/you/projects
 QA_ASSISTANT_REPO_COMMAND_TIMEOUT_SECONDS=60
 ```
 
+`QA_ASSISTANT_ALLOWED_REPO_ROOTS` is required for repo scan, write, and test
+execution features. Leave it unset to disable local repo integration.
+
 Optional backend auth:
 
 ```bash
@@ -92,7 +95,7 @@ When `QA_ASSISTANT_ACCESS_TOKEN` is set, the frontend must send the same value a
 - `.env` and `.env.*` are ignored by Git.
 - Never commit real provider keys.
 - Repo writes require explicit approval from the UI.
-- Repo operations are restricted by `QA_ASSISTANT_ALLOWED_REPO_ROOTS`.
+- Repo operations are disabled unless `QA_ASSISTANT_ALLOWED_REPO_ROOTS` is set, and are restricted to those roots.
 - Test execution is allowlisted and time-limited.
 - URL fetching is restricted to public `http`/`https`, blocks private IP ranges, limits redirects, and caps response size.
 - `QA_ASSISTANT_VERIFY_SSL=false` exists only for trusted corporate proxy environments.

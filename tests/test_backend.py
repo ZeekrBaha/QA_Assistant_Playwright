@@ -246,6 +246,13 @@ def test_repo_scan_rejects_paths_outside_allowed_roots(tmp_path, monkeypatch):
     assert response.status_code == 400
 
 
+def test_repo_scan_requires_explicit_allowed_roots(tmp_path, monkeypatch):
+    monkeypatch.delenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", raising=False)
+
+    with pytest.raises(ValueError, match="QA_ASSISTANT_ALLOWED_REPO_ROOTS"):
+        scan_repo(str(tmp_path))
+
+
 def test_repo_write_requires_approval_and_safe_relative_path(tmp_path, monkeypatch):
     monkeypatch.setenv("QA_ASSISTANT_ALLOWED_REPO_ROOTS", str(tmp_path))
 
