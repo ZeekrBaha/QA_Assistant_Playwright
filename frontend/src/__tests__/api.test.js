@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest'
-import { buildHeaders, parseSseEvents } from '../lib/api'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { apiJson, buildHeaders, parseSseEvents } from '../lib/api'
 
 describe('api helpers', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('parses SSE token, meta, and done events', () => {
     const events = parseSseEvents([
       'data: {"type":"meta","source_url":"https://example.com"}',
@@ -27,5 +31,25 @@ describe('api helpers', () => {
       'Content-Type': 'application/json',
       'X-Backend-Token': 'secret-token',
     })
+  })
+
+  it('keeps authentication headers when a request adds custom headers', async () => {
+    window.sessionStorage.setItem('qa_backend_token', 'secret-token')
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ status: 'ok' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await apiJson('/api/health', { headers: { 'X-Request-Id': 'request-123' } })
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/health', expect.objectContaining({
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Backend-Token': 'secret-token',
+        'X-Request-Id': 'request-123',
+      },
+    }))
   })
 })

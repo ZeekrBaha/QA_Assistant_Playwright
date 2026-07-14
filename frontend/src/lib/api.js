@@ -2,9 +2,10 @@ import { API_BASE } from './config'
 import { loadBackendToken } from './sensitiveStorage'
 
 export async function apiJson(path, options = {}) {
+  const { headers, ...requestOptions } = options
   const response = await fetch(`${API_BASE}${path}`, {
-    headers: buildHeaders(options.headers),
-    ...options,
+    ...requestOptions,
+    headers: buildHeaders(headers),
   })
 
   const contentType = response.headers.get('content-type') || ''
