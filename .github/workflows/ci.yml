@@ -33,7 +33,7 @@ jobs:
         run: uvx ruff check .
 
       - name: Test backend
-        run: uv run pytest
+        run: uv run python -m pytest
 
       - name: Install Node dependencies
         run: |
@@ -50,7 +50,7 @@ jobs:
 
       - name: Run Playwright smoke test
         run: |
-          uv run uvicorn backend.server:app --host 127.0.0.1 --port 8000 &
+          uv run python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000 &
           QA_API_TARGET=http://127.0.0.1:8000 npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 &
           until curl --fail --silent http://127.0.0.1:8000/api/health && curl --fail --silent http://127.0.0.1:5173; do sleep 1; done
           npm run test:e2e
