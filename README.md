@@ -23,7 +23,8 @@ qa-assistant-reliable/
   frontend/                React + Vite UI
   tests/                   Backend tests and Playwright smoke test
   api/index.py             Deployment entrypoint for ASGI hosts
-  requirements.txt         Pinned Python dependencies
+  requirements.txt         Direct Python dependencies
+  requirements.lock        Fully pinned Python environment
   package.json             Root scripts for backend/frontend/e2e tests
 ```
 
@@ -113,7 +114,7 @@ Create a Python virtual environment:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.lock
 ```
 
 Install Node dependencies:
@@ -236,7 +237,6 @@ Do not expose this app publicly without real authentication, rate limiting, secr
 - Provider keys pasted into the UI are stored in browser localStorage for convenience. Use server-side `.env` keys for more controlled local runs.
 - Repo integration is local-machine functionality. It is disabled until both `QA_ASSISTANT_ACCESS_TOKEN` and `QA_ASSISTANT_ALLOWED_REPO_ROOTS` are configured.
 - Provider adapters catch SDK/network failures broadly and return user-facing error text; live provider behavior should be rechecked with real API keys before public release.
-- The backend uses pinned `requirements.txt` versions but does not yet include a generated Python lockfile.
 
 ## Git Hygiene
 
