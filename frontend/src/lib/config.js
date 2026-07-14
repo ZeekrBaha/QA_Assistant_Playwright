@@ -21,7 +21,7 @@ export function loadTemperature(storage = window.localStorage) {
   const saved = storage.getItem('qa_temperature')
   if (saved === null || saved === '') return 0.6
   const parsed = Number.parseFloat(saved)
-  return Number.isNaN(parsed) ? 0.6 : parsed
+  return Number.isNaN(parsed) || parsed < 0 || parsed > 1 ? 0.6 : parsed
 }
 
 export function loadModelPreferences(storage = window.localStorage) {
