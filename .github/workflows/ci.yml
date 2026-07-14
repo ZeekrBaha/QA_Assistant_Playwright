@@ -15,6 +15,8 @@ jobs:
           python-version: "3.13"
 
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: false
 
       - uses: actions/setup-node@v4
         with:
